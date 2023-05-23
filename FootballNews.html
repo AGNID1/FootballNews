@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Football News</title>
+    <style>
+        body {
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+        }
+        .news {
+            margin-bottom: 20px;
+        }
+        .news .title {
+            font-weight: bold;
+        }
+        .news .score {
+            font-size: 1.2em;
+        }
+        .news .transfer {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Football News</h1>
+        <div id="background"></div>
+        <div id="news"></div>
+    </div>
+
+    <script>
+        // Fetch player images from API
+        async function fetchPlayerImages() {
+            const apiKey = 'YOUR_API_KEY'; // Replace with your API key from API-Football
+            const playerId = Math.floor(Math.random() * 500); // Choose a random player ID
+
+            try {
+                const response = await fetch(`https://v3.football.api-sports.io/players?id=${playerId}`, {
+                    headers: {
+                        'x-rapidapi-host': 'v3.football.api-sports.io',
+                        'x-rapidapi-key': apiKey
+                    }
+                });
+                const data = await response.json();
+                const player = data.response[0];
+
+                return {
+                    name: `${player.firstname} ${player.lastname}`,
+                    image: player.photo
+                };
+            } catch (error) {
+                console.log(error);
+                return null;
+            }
+        }
+
+        // News data
+        const news = [
+            { title: 'Match Result', score: 'Team A 2 - 1 Team B' },
+            { title: 'Transfer News', transfer: 'Player X joins Team Y' },
+            // Add more news here...
+        ];
+
+        // Function to set a random player and news on the website
+        async function setRandomPlayerAndNews() {
+            // Fetch player images
+            const player = await fetchPlayerImages();
+
+            if (player) {
+                // Set background image and player name
+                document.getElementById('background').style.backgroundImage = `url(${player.image})`;
+                document.getElementById('background').textContent = player.name;
+            }
+
+            // Clear existing news
+            const newsContainer = document.getElementById('news');
+            newsContainer.innerHTML = '';
+
+            // Set random news
+            const randomNews = news[Math.floor(Math.random() * news.length)];
+
+            if (randomNews.title) {
+                const titleElement = document.createElement('div');
+                titleElement.classList.add('news');
+                titleElement.innerHTML = `<div class="title">${randomNews.title}</div>`;
+                newsContainer.appendChild(titleElement);
+            }
+
+            if (randomNews.score) {
+                const scoreElement = document.createElement('div');
+                scoreElement.classList.add('news');
+                scoreElement.innerHTML = `<div class="score">${randomNews.score}</div>`;
+                newsContainer.appendChild(scoreElement);
+            }
+
+            if (randomNews.transfer) {
+                const transferElement = document.createElement('div');
+                transferElement.classList.add('news');
+                transferElement.innerHTML = `<div class="transfer">${randomNews.transfer}</div>`;
+                newsContainer.appendChild(transferElement);
+            }
+        }
+
+        // Set initial player and news
+        setRandomPlayerAndNews();
+
+        // Update player and news every 24 hours (in milliseconds)
+        setInterval(setRandomPlayerAndNews, 24 * 60 * 60 * 1000);
+    </script>
+</body>
+</html>
+
